@@ -1,1 +1,1 @@
-# esp32-starter
+# smart-plant
