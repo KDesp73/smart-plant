@@ -18,8 +18,8 @@ void oled_dashboard(Oled oled, const State* state)
     oled.setCursor(5, 25);
     oled.print("Light: ");
     oled.printf("%.0f", state->data.light);
-    oled.print("% Water: ");
-    oled.print(state->waterPump ? "ON" : "OFF");
+    oled.print("%  RH: ");
+    oled.printf("%.0f%%", state->data.humidity);
 
     // Moisture bar
     oled.drawXBMP(5, 38, 16, 16, icon_moisture);
