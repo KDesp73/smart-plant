@@ -2,3 +2,4 @@
 .cache
 .changelog
 .env
+compile_commands.json
