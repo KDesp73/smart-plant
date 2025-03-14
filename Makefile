@@ -1,11 +1,11 @@
 .DEFAULT_GOAL := help
 
 .PHONY: build
-build: ## Compile
+build: cc ## Compile
 	pio run
 
 .PHONY: upload
-upload: ## Upload the script
+upload: cc ## Upload the script
 	pio run -t upload
 
 .PHONY: monitor
