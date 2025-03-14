@@ -1,9 +1,10 @@
 #pragma once
 
 typedef struct {
-    int temperature;
-    int moisture;
-    int light;
+    float temperature;
+    float humidity;
+    float moisture;
+    float light;
 } Data;
 
 typedef struct {
@@ -11,5 +12,4 @@ typedef struct {
     bool waterPump;
 } State;
 
-void collect_data(Data* data);
 void update_state(State* state);

@@ -9,15 +9,15 @@ void oled_dashboard(Oled oled, const State* state)
     // Row 1: Text info
     oled.setCursor(5, 12);
     oled.print("Soil: ");
-    oled.print(state->data.moisture);
+    oled.printf("%.0f", state->data.moisture);
     oled.print("%  Temp: ");
-    oled.print(state->data.temperature);
+    oled.printf("%.0f", state->data.temperature);
     oled.print("C");
 
     // Row 2: Light and Water
     oled.setCursor(5, 25);
     oled.print("Light: ");
-    oled.print(state->data.light);
+    oled.printf("%.0f", state->data.light);
     oled.print("% Water: ");
     oled.print(state->waterPump ? "ON" : "OFF");
 
