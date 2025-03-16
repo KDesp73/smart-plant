@@ -18,3 +18,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - MQTT connection
 
 
+[1.0.0]: https://github.com/KDesp73/smart-plant/releases/tag/v1.0.0
+
