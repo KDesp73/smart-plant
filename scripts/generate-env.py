@@ -16,6 +16,10 @@ class ConfigGenerator:
     def add_variable(self, key, default_value):
         """Adds a variable to the config dictionary with optional default."""
         value = self.strip_quotes(os.getenv(key, default_value))
+
+        if value is None or value == "":
+            raise ValueError(f"Environment variable '{key}' not found or is empty in the .env file.")
+
         self.config[key] = value
 
     def generate_header(self, output_file="include/env.h"):
