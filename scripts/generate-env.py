@@ -35,12 +35,8 @@ class ConfigGenerator:
 
         print(f"Generated {output_file} successfully.")
 
-# Example usage:
-
-# Create a config generator instance
 gen = ConfigGenerator()
 
-# Add variables, with optional default values
 gen.add_variable("WIFI_SSID", "")
 gen.add_variable("WIFI_PASS", "")
 gen.add_variable("MQTT_SERVER", "")
@@ -51,7 +47,6 @@ gen.add_variable("MQTT_PASSWORD", "")
 gen.add_variable("PUSHBULLET_API_KEY", "")
 gen.add_variable("PUSHBULLET_DEVICE_ID", "")
 
-# Print the loaded values (for debugging purposes)
 print("Loaded values:")
 for key, value in gen.config.items():
     if key == "WIFI_PASS":
@@ -60,5 +55,4 @@ for key, value in gen.config.items():
     else:
         print(f"- {key}: {value}")
 
-# Generate the env.h file
 gen.generate_header()
