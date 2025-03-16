@@ -7,15 +7,22 @@
 
 void connect_wifi()
 {
+    delay(10);
     const char* ssid = WIFI_SSID;
     const char* pass = WIFI_PASS;
     Serial.printf("Connecting to %s", ssid);
+    WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, pass);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
     }
-    Serial.println("\nWiFi Connected");
+    randomSeed(micros());
+
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.print("IP address: ");
+    Serial.println(WiFi.localIP());
 }
 
 void connect_mqtt(PubSubClient* client)
@@ -27,8 +34,8 @@ void connect_mqtt(PubSubClient* client)
         if (client->connect(client_id.c_str(), MQTT_USERNAME, MQTT_PASSWORD)) {
             Serial.println("Connected");
         } else {
-            Serial.print("\nFailed, retrying in 5s...");
-            Serial.print(client->state());
+            Serial.println("\nFailed, retrying in 5s...");
+            Serial.printf("State: %d\n", client->state());
             delay(5000);
         }
     }

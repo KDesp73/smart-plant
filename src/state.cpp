@@ -23,6 +23,7 @@ String data_serialize(const Data* data)
 
 void data_print(const Data* data)
 {
+    Serial.println("\n=============================\n");
     Serial.printf("Temp: %fC\n", data->temperature);
     Serial.printf("RH: %f%%\n", data->humidity);
     Serial.printf("Light: %f%%\n", data->light);

@@ -9,7 +9,6 @@ typedef struct {
 } Data;
 
 void data_print(const Data* data);
-
 String data_serialize(const Data* data);
 
 typedef struct {

@@ -1,9 +1,7 @@
-#include "esp32-hal.h"
-#include "light.h"
 #include "mqtt.h"
 #include "oled.h"
 #include "state.h"
-#include "temperature.h"
+#include "sensors.h"
 #include "timer.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -15,24 +13,29 @@
 #include <U8g2lib.h>
 #include <WiFi.h>
 #include <Wire.h>
+#include <WiFiClientSecure.h>
 
-// Initialize OLED (I2C, SSD1306)
 Oled oled(U8G2_R0, /* SCL=*/ 22, /* SDA=*/ 21, /* RST=*/ U8X8_PIN_NONE);
 DHT_Unified dht(DHTPIN, DHTTYPE);
-WiFiClient espClient;
+WiFiClientSecure espClient;
 PubSubClient client(espClient);
 
 State state = {0};
 
 uint32_t delayMS;
 
+#define SWITCH_PIN 5
+static bool mqttEnabled = false;
+
 void setup() {
     Serial.begin(115200);
     delay(2000);
     oled.begin();
     dht.begin();
+    pinMode(SWITCH_PIN, INPUT_PULLUP);
 
-    // mqtt_init(&client);
+    espClient.setInsecure();
+    mqtt_init(&client);
 
     sensor_t sensor;
     dht.temperature().getSensor(&sensor);
@@ -40,14 +43,17 @@ void setup() {
 }
 
 void loop() {
-    // if (!client.connected()) {
-    //     connect_mqtt(&client);
-    // }
-    // client.loop();
+    mqttEnabled = (digitalRead(SWITCH_PIN) == LOW);
 
-    EVERY_MS(sensorsTimer, 2000, {
+    if (!client.connected()) {
+        connect_mqtt(&client);
+    }
+    client.loop();
+
+    EVERY_MS(sensorsTimer, delayMS, {
         read_dht22(dht, &state.data);
         read_light(&state.data);
+        read_soil(&state.data);
         data_print(&state.data);
     })
 
@@ -55,7 +61,9 @@ void loop() {
 
     update_state(&state);
 
-    // EVERY_MS(mqttTimer, 5000, {
-    //     publish_data(&client, &state.data);
-    // })
+    if(mqttEnabled) {
+        EVERY_MS(mqttTimer, 30000, {
+            publish_data(&client, &state.data);
+        })
+    }
 }
