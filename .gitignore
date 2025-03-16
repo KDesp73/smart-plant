@@ -2,4 +2,5 @@
 .cache
 .changelog
 .env
+include/env.h
 compile_commands.json

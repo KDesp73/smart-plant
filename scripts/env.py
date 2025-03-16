@@ -12,16 +12,16 @@ mqtt_server = os.getenv("MQTT_SERVER", "")
 mqtt_port   = os.getenv("MQTT_PORT", 0)
 mqtt_topic  = os.getenv("MQTT_TOPIC", "")
 
-print(f"Loaded values:\n- WIFI_SSID: {wifi_ssid}\n- WIFI_PASS: {wifi_pass}\n- MQTT_SERVER: {mqtt_server}\n- MQTT_PORT: {mqtt_port}\n- MQTT_TOPIC: {mqtt_topic}")
+print(f"Loaded values:\n- WIFI_SSID: {wifi_ssid}\n- WIFI_PASS: {"*" * len(wifi_pass)}\n- MQTT_SERVER: {mqtt_server}\n- MQTT_PORT: {mqtt_port}\n- MQTT_TOPIC: {mqtt_topic}")
 
 if env.IsIntegrationDump():
    # stop the current script execution
    Return()
 
 env.Append(CPPDEFINES=[
-    ("WIFI_SSID", wifi_ssid),
-    ("WIFI_PASS", wifi_pass),
-    ("MQTT_SERVER", mqtt_server),
-    ("MQTT_PORT", mqtt_port),
-    ("MQTT_TOPIC", mqtt_topic)
+    ("WIFI_SSID", env.StringifyMacro(wifi_ssid)),
+    ("WIFI_PASS", env.StringifyMacro(wifi_pass)),
+    ("MQTT_SERVER", env.StringifyMacro(mqtt_server)),
+    ("MQTT_PORT", int(mqtt_port)),
+    ("MQTT_TOPIC", env.StringifyMacro(mqtt_topic))
 ])

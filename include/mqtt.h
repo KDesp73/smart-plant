@@ -1,29 +1,21 @@
 #pragma once
 
 #include "PubSubClient.h"
+#include "env.h"
 #include "state.h"
 
-#ifndef WIFI_SSID
-    #define WIFI_SSID ""
-#endif // WIFI_SSID
-
-#ifndef WIFI_PASS
-    #define WIFI_PASS ""
-#endif // WIFI_PASS
-
-#ifndef MQTT_SERVER
-    #define MQTT_SERVER ""
-#endif // MQTT_SERVER
-
-#ifndef MQTT_PORT
-    #define MQTT_PORT 0
-#endif // MQTT_PORT
-
-#ifndef MQTT_TOPIC
-    #define MQTT_TOPIC ""
-#endif // MQTT_TOPIC
+#define STRINGIFY(x) #x
+#define STR(x) STRINGIFY(x)
 
 void connect_wifi();
-void connect_mqtt(PubSubClient client);
-void publish_data(PubSubClient client, const Data* data);
+void connect_mqtt(PubSubClient* client);
+void publish_data(PubSubClient* client, const Data* data);
 
+static inline void mqtt_init(PubSubClient* client)
+{
+    const char* server = MQTT_SERVER;
+    const long port = MQTT_PORT;
+    connect_wifi();
+    client->setServer(server, port);
+    connect_mqtt(client);
+}

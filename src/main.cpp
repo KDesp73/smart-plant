@@ -1,18 +1,20 @@
-#include "PubSubClient.h"
+#include "esp32-hal.h"
+#include "light.h"
 #include "mqtt.h"
-#include "state.h"
 #include "oled.h"
+#include "state.h"
 #include "temperature.h"
 #include "timer.h"
-#include <Arduino.h>
-#include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <U8g2lib.h>
 #include <Adafruit_Sensor.h>
+#include <Arduino.h>
 #include <DHT.h>
 #include <DHT_U.h>
+#include "PubSubClient.h"
+#include <U8g2lib.h>
 #include <WiFi.h>
+#include <Wire.h>
 
 // Initialize OLED (I2C, SSD1306)
 Oled oled(U8G2_R0, /* SCL=*/ 22, /* SDA=*/ 21, /* RST=*/ U8X8_PIN_NONE);
@@ -26,12 +28,11 @@ uint32_t delayMS;
 
 void setup() {
     Serial.begin(115200);
+    delay(2000);
     oled.begin();
     dht.begin();
 
-    // connect_wifi();
-    // client.setServer(MQTT_SERVER, MQTT_PORT);
-    // connect_mqtt(client);
+    // mqtt_init(&client);
 
     sensor_t sensor;
     dht.temperature().getSensor(&sensor);
@@ -40,12 +41,14 @@ void setup() {
 
 void loop() {
     // if (!client.connected()) {
-    //     connect_mqtt(client);
+    //     connect_mqtt(&client);
     // }
     // client.loop();
 
     EVERY_MS(sensorsTimer, 2000, {
         read_dht22(dht, &state.data);
+        read_light(&state.data);
+        data_print(&state.data);
     })
 
     oled_dashboard(oled, &state);
@@ -53,6 +56,6 @@ void loop() {
     update_state(&state);
 
     // EVERY_MS(mqttTimer, 5000, {
-    //     publish_data(client, &state.data);
+    //     publish_data(&client, &state.data);
     // })
 }
