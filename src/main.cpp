@@ -1,4 +1,5 @@
 #include "mqtt.h"
+#include "notification.h"
 #include "oled.h"
 #include "state.h"
 #include "sensors.h"
@@ -20,7 +21,9 @@ DHT_Unified dht(DHTPIN, DHTTYPE);
 WiFiClientSecure espClient;
 PubSubClient client(espClient);
 
-State state = {0};
+State state = {
+    .waterInterval = 150000
+};
 
 uint32_t delayMS;
 
@@ -60,6 +63,12 @@ void loop() {
     oled_dashboard(oled, &state);
 
     update_state(&state);
+
+    EVERY_MS(wateringTimer, state.waterInterval, {
+        if(state.waterPump) {
+            send_water_notification("The plant needs watering!");
+        }
+    })
 
     if(mqttEnabled) {
         EVERY_MS(mqttTimer, 30000, {

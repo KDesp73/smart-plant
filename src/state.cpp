@@ -4,7 +4,7 @@
 
 void update_state(State* state)
 {
-    state->waterPump = (state->data.moisture < 30);  // Auto turn ON if soil moisture is low
+    state->waterPump = (state->data.moisture < MOISTURE_THRESHOLD);
 }
     
 String data_serialize(const Data* data)
@@ -29,4 +29,3 @@ void data_print(const Data* data)
     Serial.printf("Light: %f%%\n", data->light);
     Serial.printf("Soil: %f%%\n", data->moisture);
 }
-
