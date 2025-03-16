@@ -1,52 +1,60 @@
 import os
 from dotenv import load_dotenv
 
-def strip_quotes(value):
-    if value.startswith('"') and value.endswith('"'):
-        return value[1:-1]
-    return value
+class ConfigGenerator:
+    def __init__(self, env_file=".env"):
+        # Load environment variables from the .env file
+        load_dotenv(env_file)
+        self.config = {}
 
-load_dotenv()
+    def strip_quotes(self, value):
+        """Strips quotes from the value if they exist."""
+        if value.startswith('"') and value.endswith('"'):
+            return value[1:-1]
+        return value
 
-print("generate-env.py")
+    def add_variable(self, key, default_value):
+        """Adds a variable to the config dictionary with optional default."""
+        value = self.strip_quotes(os.getenv(key, default_value))
+        self.config[key] = value
 
-wifi_ssid            = strip_quotes(os.getenv("WIFI_SSID", ""))
-wifi_pass            = strip_quotes(os.getenv("WIFI_PASS", ""))
-mqtt_server          = strip_quotes(os.getenv("MQTT_SERVER", ""))
-mqtt_port            = strip_quotes(os.getenv("MQTT_PORT", 0))
-mqtt_topic           = strip_quotes(os.getenv("MQTT_TOPIC", ""))
-mqtt_username        = strip_quotes(os.getenv("MQTT_USERNAME", ""))
-mqtt_password        = strip_quotes(os.getenv("MQTT_PASSWORD", ""))
-pushbullet_api_key   = strip_quotes(os.getenv("PUSHBULLET_API_KEY", ""))
-pushbullet_device_id = strip_quotes(os.getenv("PUSHBULLET_DEVICE_ID", ""))
+    def generate_header(self, output_file="include/env.h"):
+        """Generates the env.h file with the current config."""
+        with open(output_file, "w") as env_file:
+            env_file.write("#pragma once\n\n")
 
+            for key, value in self.config.items():
+                if isinstance(value, int):  # If it's an integer, do not quote it
+                    env_file.write(f'#define {key} {value}\n')
+                else:
+                    env_file.write(f'#define {key} "{value}"\n')
+
+        print(f"Generated {output_file} successfully.")
+
+# Example usage:
+
+# Create a config generator instance
+gen = ConfigGenerator()
+
+# Add variables, with optional default values
+gen.add_variable("WIFI_SSID", "")
+gen.add_variable("WIFI_PASS", "")
+gen.add_variable("MQTT_SERVER", "")
+gen.add_variable("MQTT_PORT", 0)
+gen.add_variable("MQTT_TOPIC", "")
+gen.add_variable("MQTT_USERNAME", "")
+gen.add_variable("MQTT_PASSWORD", "")
+gen.add_variable("PUSHBULLET_API_KEY", "")
+gen.add_variable("PUSHBULLET_DEVICE_ID", "")
+
+# Print the loaded values (for debugging purposes)
 print("Loaded values:")
-print(f"- WIFI_SSID: {wifi_ssid}")
-print(f"- WIFI_PASS: {'*' * len(wifi_pass)}")
-print(f"- MQTT_SERVER: {mqtt_server}")
-print(f"- MQTT_PORT: {mqtt_port}")
-print(f"- MQTT_TOPIC: {mqtt_topic}")
-print(f"- MQTT_USERNAME: {mqtt_username}")
-print(f"- MQTT_PASSWORD: {mqtt_password}")
-print(f"- PUSHBULLET_API_KEY: {pushbullet_api_key}")
-print(f"- PUSHBULLET_DEVICE_ID: {pushbullet_device_id}")
+for key, value in gen.config.items():
+    if key == "WIFI_PASS":
+        # Mask the password for privacy
+        print(f"- {key}: {'*' * len(value)}")
+    else:
+        print(f"- {key}: {value}")
 
 # Generate the env.h file
-env_file_path = "include/env.h"
-
-with open(env_file_path, "w") as env_file:
-    env_file.write("#pragma once\n\n")
-
-    env_file.write(f'#define WIFI_SSID "{wifi_ssid}"\n')
-    env_file.write(f'#define WIFI_PASS "{wifi_pass}"\n')
-
-    env_file.write(f'#define MQTT_SERVER "{mqtt_server}"\n')
-    env_file.write(f'#define MQTT_PORT {mqtt_port}\n')
-    env_file.write(f'#define MQTT_TOPIC "{mqtt_topic}"\n')
-    env_file.write(f'#define MQTT_USERNAME "{mqtt_username}"\n')
-    env_file.write(f'#define MQTT_PASSWORD "{mqtt_password}"\n')
-
-    env_file.write(f'#define PUSHBULLET_API_KEY "{pushbullet_api_key}"\n')
-    env_file.write(f'#define PUSHBULLET_DEVICE_ID "{pushbullet_device_id}"\n')
-
-print(f"Generated {env_file_path} successfully.")
+gen.generate_header()
