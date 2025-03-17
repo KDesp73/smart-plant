@@ -2,11 +2,6 @@
 #include "HardwareSerial.h"
 #include <ArduinoJson.h>
 
-void update_state(State* state)
-{
-    state->waterPump = (state->data.moisture < MOISTURE_THRESHOLD);
-}
-    
 String data_serialize(const Data* data)
 {
     JsonDocument doc;
@@ -28,4 +23,14 @@ void data_print(const Data* data)
     Serial.printf("RH: %f%%\n", data->humidity);
     Serial.printf("Light: %f%%\n", data->light);
     Serial.printf("Soil: %f%%\n", data->moisture);
+}
+
+void needs_print(const PlantNeeds* needs)
+{
+    Serial.println("Plant Needs");
+    Serial.printf("Watering interval: %u seconds\n", needs->waterInterval);
+    Serial.printf("Light range: %.2f - %.2f lux\n", needs->light_min, needs->light_max);
+    Serial.printf("Moisture range: %.2f%% - %.2f%%\n", needs->moisture_min, needs->moisture_max);
+    Serial.printf("Temperature range: %.2f - %.2f °C\n", needs->temperature_min, needs->temperature_max);
+    Serial.printf("Humidity range: %.2f%% - %.2f%%\n", needs->humidity_min, needs->humidity_max);
 }

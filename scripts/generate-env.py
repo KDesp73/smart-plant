@@ -20,6 +20,10 @@ class ConfigGenerator:
         if value is None or value == "":
             raise ValueError(f"Environment variable '{key}' not found or is empty in the .env file.")
 
+        # Check if the value can be converted to an integer
+        if value.isdigit():
+            value = int(value)
+        
         self.config[key] = value
 
     def generate_header(self, output_file="include/env.h"):
@@ -35,6 +39,7 @@ class ConfigGenerator:
 
         print(f"Generated {output_file} successfully.")
 
+# Usage example
 gen = ConfigGenerator()
 
 gen.add_variable("WIFI_SSID", "")

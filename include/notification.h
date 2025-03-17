@@ -3,7 +3,7 @@
 #include "WString.h"
 #include "env.h"
 
-static inline void send_water_notification(String message)
+static inline void send_notification(String title, String message)
 {
     HTTPClient http;
 
@@ -12,7 +12,7 @@ static inline void send_water_notification(String message)
     http.addHeader("Content-Type", "application/json");
     http.addHeader("Authorization", "Bearer " + String(PUSHBULLET_API_KEY));
 
-    String payload = "{\"type\":\"note\", \"title\":\"Plant Watering Alert\", \"body\":\"" + message + "\", \"device_iden\":\"" + PUSHBULLET_DEVICE_ID + "\"}";
+    String payload = "{\"type\":\"note\", \"title\":\"" + title + "\", \"body\":\"" + message + "\", \"device_iden\":\"" + PUSHBULLET_DEVICE_ID + "\"}";
 
     int httpCode = http.POST(payload);
 

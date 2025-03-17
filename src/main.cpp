@@ -22,7 +22,17 @@ WiFiClientSecure espClient;
 PubSubClient client(espClient);
 
 State state = {
-    .waterInterval = 150000
+    .needs = {
+        .waterInterval   = PLANT_WATERING_INTERVAL,
+        .light_min       = PLANT_LIGHT_MIN,
+        .light_max       = PLANT_LIGHT_MAX,
+        .moisture_min    = PLANT_MOISTURE_MIN,
+        .moisture_max    = PLANT_MOISTURE_MAX,
+        .temperature_min = PLANT_TEMPERATURE_MIN,
+        .temperature_max = PLANT_TEMPERATURE_MAX,
+        .humidity_min    = PLANT_HUMIDITY_MIN,
+        .humidity_max    = PLANT_HUMIDITY_MAX
+    }
 };
 
 uint32_t delayMS;
@@ -43,6 +53,8 @@ void setup() {
     sensor_t sensor;
     dht.temperature().getSensor(&sensor);
     delayMS = sensor.min_delay / 1000;
+
+    needs_print(&state.needs);
 }
 
 void loop() {
@@ -62,11 +74,33 @@ void loop() {
 
     oled_dashboard(oled, &state);
 
-    update_state(&state);
+    EVERY_MS(wateringTimer, state.needs.waterInterval, {
+        if(needsWater(&state)) {
+            send_notification("Plant Watering Alert", "The plant needs watering!");
+        }
+        if(tooMuchWater(&state)) {
+            send_notification("Plant Watering Alert", "The plant is drowning!");
+        }
+    })
 
-    EVERY_MS(wateringTimer, state.waterInterval, {
-        if(state.waterPump) {
-            send_water_notification("The plant needs watering!");
+    EVERY_MS(envTimer, 10000, {
+        if(needsLight(&state)) {
+            send_notification("Plant Lighting Alert", "The plant needs more light!");
+        }
+        if(tooMuchLight(&state)) {
+            send_notification("Plant Lighting Alert", "The plant needs less light!");
+        }
+        if(needsWarmth(&state)) {
+            send_notification("Plant Temperature Alert", "The plant is cold!");
+        }
+        if(tooMuchWarmth(&state)) {
+            send_notification("Plant Temperature Alert", "The plant is burning!");
+        }
+        if(needsHumidity(&state)) {
+            send_notification("Plant Humidity Alert", "The environment is not humid enough!");
+        }
+        if(tooMuchHumidity(&state)) {
+            send_notification("Plant Humidity Alert", "The environment is too humid!");
         }
     })
 
