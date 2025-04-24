@@ -39,7 +39,6 @@ class ConfigGenerator:
 
         print(f"Generated {output_file} successfully.")
 
-# Usage example
 gen = ConfigGenerator()
 
 gen.add_variable("WIFI_SSID", "")
